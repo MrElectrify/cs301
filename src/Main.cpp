@@ -13,13 +13,13 @@ int main(int argc, char* argv[])
 	database.ImportData(dataPath, ec);
 	if (ec)
 	{
-		std::cerr << "Failed to import data from " << dataPath << '\n';
+		std::cerr << "Failed to import data from " << dataPath << ": " << ec.message() << '\n';
 		return 1;
 	}
 	database.ExecuteQuery(queryPath, ec);
 	if (ec)
 	{
-		std::cerr << "Failed to execute queries from " << queryPath << '\n';
+		std::cerr << "Failed to execute queries from " << queryPath << ": " << ec.message() <<  '\n';
 		return 1;
 	}
 	return 0;
