@@ -10,13 +10,18 @@
 
 namespace FinalProject
 {
+	/// @brief Database is a NoSQL document-based database
 	class Database
 	{
 	public:
 		/// @brief Imports data to the database
-		/// @param path The path of the data
+		/// @param dataPath The path of the data
 		/// @return The success of the operation
-		bool ImportData(const std::string path = "data.txt") noexcept;
+		bool ImportData(const std::string& dataPath) noexcept;
+		/// @brief Executes queries and outputs any necessary data
+		/// @param queryPath The path of the query
+		/// @return The success of the operation
+		bool ExecuteQuery(const std::string& queryPath) noexcept;
 	};
 }
 
