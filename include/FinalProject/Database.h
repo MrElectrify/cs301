@@ -6,7 +6,8 @@
 /// 11/30/20 20:02
 
 // FinalProject includes
-#include <FinalProject/DataParser.h>
+#include <FinalProject/Detail/DataParser.h>
+#include <FinalProject/Detail/QueryParser.h>
 
 // STL includes
 #include <string>
@@ -51,13 +52,16 @@ namespace FinalProject
 		/// @param ec The error code
 		void ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept;
 	private:
-		using Node_t = DataParser::Node_t;
-		using Collection_t = DataParser::Collection_t;
+		using Node_t = Detail::DataParser::Node_t;
+		using Collection_t = Detail::DataParser::Collection_t;
 
-		DataParser m_dataParser;
+		Detail::DataParser m_dataParser;
+		Detail::QueryParser m_queryParser;
 
 		std::vector<Collection_t> m_collections;
 		std::unordered_multimap<Node_t, size_t, impl::hash_pair> m_nodeToCollectionIndexMap;
+
+		friend class Query;
 	};
 }
 

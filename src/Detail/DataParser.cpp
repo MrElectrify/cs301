@@ -1,6 +1,6 @@
-#include <FinalProject/DataParser.h>
+#include <FinalProject/Detail/DataParser.h>
 
-using FinalProject::DataParser;
+using FinalProject::Detail::DataParser;
 
 bool DataParser::Consume(Collection_t& collection, char input)
 {

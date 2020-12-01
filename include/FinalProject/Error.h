@@ -19,6 +19,7 @@ namespace FinalProject
 		InvalidFormat,			// the format was invalid
 		InvalidData,			// the data was invalid
 		InvalidState,			// the state was invalid (data corruption)
+		InvalidQuery,			// the query name was invalid
 		IncompleteData,			// the data was incomplete
 	};
 	std::error_code make_error_code(DatabaseErrc errc);
