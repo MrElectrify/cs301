@@ -5,6 +5,9 @@
 /// Database
 /// 11/30/20 20:02
 
+// FinalProject includes
+#include <FinalProject/Error.h>
+
 // STL includes
 #include <string>
 
@@ -15,13 +18,21 @@ namespace FinalProject
 	{
 	public:
 		/// @brief Imports data to the database
-		/// @param dataPath The path of the data
-		/// @return The success of the operation
-		bool ImportData(const std::string& dataPath) noexcept;
+		/// @param dataPath The path to the data
+		/// @throws std::error_code
+		void ImportData(const std::string& dataPath);
+		/// @brief Imports data to the database
+		/// @param dataPath The path to the data
+		/// @param ec The error code
+		void ImportData(const std::string& dataPath, std::error_code& ec) noexcept;
 		/// @brief Executes queries and outputs any necessary data
-		/// @param queryPath The path of the query
-		/// @return The success of the operation
-		bool ExecuteQuery(const std::string& queryPath) noexcept;
+		/// @param queryPath The path to the query
+		/// @throws std::error_code
+		void ExecuteQuery(const std::string& queryPath);
+		/// @brief Executes queries and outputs any necessary data
+		/// @param queryPath The path to the query
+		/// @param ec The error code
+		void ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept;
 	};
 }
 
