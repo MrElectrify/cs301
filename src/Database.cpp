@@ -42,18 +42,51 @@ void Database::ImportData(const std::string& dataPath, std::error_code& ec) noex
 	}
 }
 
-void Database::ExecuteQuery(const std::string& queryPath)
+void Database::ImportQueries(const std::string& queryPath)
 {
 	std::ifstream inQuery(queryPath);
 	if (inQuery.good() == false)
 		throw make_error_code(DatabaseErrc::FileNotFound);
+	// read the data
+	std::string queries((std::istreambuf_iterator<char>(inQuery)),
+		std::istreambuf_iterator<char>());
+	// parse the data
+	std::string::const_iterator it = queries.cbegin();
+	while (it != queries.cend())
+	{
+		Detail::QueryParser::QueryPtr_t queryPtr;
+		// parse the query
+		std::tie(queryPtr, it) =
+			m_queryParser.ParseQuery(it, queries.cend());
+		// import the query
+		m_queries.push_back(std::move(queryPtr));
+	}
 }
 
-void Database::ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept
+void Database::ImportQueries(const std::string& queryPath, std::error_code& ec) noexcept
 {
 	try
 	{
-		ExecuteQuery(queryPath);
+		ImportQueries(queryPath);
+	}
+	catch (const std::error_code& e)
+	{
+		ec = e;
+	}
+}
+
+void Database::ExecuteQueries()
+{
+	for (const Detail::QueryParser::QueryPtr_t& queryPtr : m_queries)
+		queryPtr->Execute(*this);
+	m_queries.clear();
+}
+
+void Database::ExecuteQueries(std::error_code& ec) noexcept
+{
+	try
+	{
+		ExecuteQueries();
 	}
 	catch (const std::error_code& e)
 	{

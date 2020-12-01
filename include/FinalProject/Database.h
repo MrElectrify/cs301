@@ -35,6 +35,11 @@ namespace FinalProject
 	class Database
 	{
 	public:
+		using Node_t = Detail::DataParser::Node_t;
+		using Collection_t = Detail::DataParser::Collection_t;
+		using CollectionVec_t = std::vector<Collection_t>;
+		using NodeToCollectionIndexMap_t = std::unordered_multimap<Node_t, size_t, impl::hash_pair>;
+		
 		/// @brief Imports data to the database
 		/// @param dataPath The path to the data
 		/// @throws std::error_code
@@ -43,25 +48,29 @@ namespace FinalProject
 		/// @param dataPath The path to the data
 		/// @param ec The error code
 		void ImportData(const std::string& dataPath, std::error_code& ec) noexcept;
-		/// @brief Executes queries and outputs any necessary data
+		/// @brief Imports queries to the database
 		/// @param queryPath The path to the query
 		/// @throws std::error_code
-		void ExecuteQuery(const std::string& queryPath);
-		/// @brief Executes queries and outputs any necessary data
+		void ImportQueries(const std::string& queryPath);
+		/// @brief Imports queries to the database
 		/// @param queryPath The path to the query
 		/// @param ec The error code
-		void ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept;
-	private:
-		using Node_t = Detail::DataParser::Node_t;
-		using Collection_t = Detail::DataParser::Collection_t;
+		void ImportQueries(const std::string& queryPath, std::error_code& ec) noexcept;
+		/// @brief Executes imported queries and clears them
+		/// @throws std::error_code
+		void ExecuteQueries();
+		/// @brief Executes imported queries and clears them
+		void ExecuteQueries(std::error_code& ec) noexcept;
 
+		const CollectionVec_t& GetCollectionVec() const noexcept { return m_collections; }
+		const NodeToCollectionIndexMap_t& GetNodeToCollectionIndexMap() const noexcept { return m_nodeToCollectionIndexMap; }
+	private:
 		Detail::DataParser m_dataParser;
 		Detail::QueryParser m_queryParser;
 
-		std::vector<Collection_t> m_collections;
-		std::unordered_multimap<Node_t, size_t, impl::hash_pair> m_nodeToCollectionIndexMap;
-
-		friend class Query;
+		CollectionVec_t m_collections;
+		NodeToCollectionIndexMap_t m_nodeToCollectionIndexMap;
+		std::vector<Detail::QueryParser::QueryPtr_t> m_queries;
 	};
 }
 

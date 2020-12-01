@@ -7,6 +7,9 @@ bool DataParser::Consume(Collection_t& collection, char input)
 	switch (m_state)
 	{
 	case State::EXPECT_VARNAME:
+		// ignore spaces
+		if (input == ' ')
+			return false;
 		// the collection is complete
 		if (input == '\n')
 			return true;

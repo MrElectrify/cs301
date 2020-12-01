@@ -80,7 +80,7 @@ namespace FinalProject
 			/// @return Whether or not the collection is complete
 			bool Consume(Collection_t& collection, char input);
 
-			uint32_t m_lastId = 0;
+			uint32_t m_lastId = 1;
 			State m_state = State::EXPECT_VARNAME;
 			char m_varName = 0;
 			uint32_t m_varData = 0;

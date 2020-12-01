@@ -17,6 +17,16 @@ namespace FinalProject
 			class Sort : public Query
 			{
 			public:
+				void Execute(const Database& database);
+
+				~Sort() {}
+			private:
+				enum class State
+				{
+
+				};
+
+				bool Consume(char input);
 			};
 		}
 	}

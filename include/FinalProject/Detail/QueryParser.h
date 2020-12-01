@@ -7,6 +7,7 @@
 
 // FinalProject includes
 #include <FinalProject/Error.h>
+#include <FinalProject/Detail/Query.h>
 
 // STL includes
 #include <memory>
@@ -38,7 +39,7 @@ namespace FinalProject
 				while (begin != end)
 				{
 					if (Consume(query, *begin++) == true)
-						return std::make_pair(query, begin);
+						return std::make_pair(std::move(query), begin);
 				}
 				throw make_error_code(DatabaseErrc::IncompleteData);
 			}

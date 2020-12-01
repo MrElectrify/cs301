@@ -20,7 +20,9 @@ namespace FinalProject
 		InvalidData,			// the data was invalid
 		InvalidState,			// the state was invalid (data corruption)
 		InvalidQuery,			// the query name was invalid
+		InvalidOperator,		// the query contained an invalid operator
 		IncompleteData,			// the data was incomplete
+		UnexpectedChar,			// unexpected character
 	};
 	std::error_code make_error_code(DatabaseErrc errc);
 	class DatabaseErrorCategory :

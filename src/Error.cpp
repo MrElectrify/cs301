@@ -23,8 +23,12 @@ std::string DatabaseErrorCategory::message(int ev) const
 		return "The state was invalid. Possible data corruption";
 	case DatabaseErrc::InvalidQuery:
 		return "The query name was invalid";
+	case DatabaseErrc::InvalidOperator:
+		return "The query contained an invalid operator";
 	case DatabaseErrc::IncompleteData:
 		return "The input data was incomplete";
+	case DatabaseErrc::UnexpectedChar:
+		return "Unexpected character";
 	default:
 		return "Unknown error";
 	}
