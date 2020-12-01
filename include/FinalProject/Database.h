@@ -10,9 +10,25 @@
 
 // STL includes
 #include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace FinalProject
 {
+	namespace impl
+	{
+		struct hash_pair {
+			template <class T1, class T2>
+			size_t operator()(const std::pair<T1, T2>& p) const
+			{
+				auto hash1 = std::hash<T1>{}(p.first);
+				auto hash2 = std::hash<T2>{}(p.second);
+				return hash1 ^ hash2;
+			}
+		};
+	}
+
 	/// @brief Database is a NoSQL document-based database
 	class Database
 	{
@@ -33,6 +49,17 @@ namespace FinalProject
 		/// @param queryPath The path to the query
 		/// @param ec The error code
 		void ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept;
+	private:
+		/// @brief Parses input data and adds to the database
+		/// @param data The data string
+		/// @throws std::error_code
+		void ParseData(const std::string& data);
+
+		using Node_t = std::pair<std::string, std::string>;
+		using Collection_t = std::vector<Node_t>;
+
+		std::vector<Collection_t> m_collections;
+		std::unordered_map<Node_t, std::vector<Collection_t>::const_iterator, impl::hash_pair> m_collectionMap;
 	};
 }
 
