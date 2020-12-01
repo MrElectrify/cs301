@@ -13,6 +13,16 @@ std::string DatabaseErrorCategory::message(int ev) const
 	{
 	case DatabaseErrc::FileNotFound:
 		return "The file was not found";
+	case DatabaseErrc::InvalidVariableName:
+		return "The variable name was invalid";
+	case DatabaseErrc::InvalidFormat:
+		return "The format was invalid";
+	case DatabaseErrc::InvalidData:
+		return "The data was invalid";
+	case DatabaseErrc::InvalidState:
+		return "The state was invalid. Possible data corruption";
+	case DatabaseErrc::IncompleteData:
+		return "The input data was incomplete";
 	default:
 		return "Unknown error";
 	}

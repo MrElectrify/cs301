@@ -1,5 +1,7 @@
 #include <FinalProject/Database.h>
 
+#include <FinalProject/Error.h>
+
 #include <fstream>
 #include <iterator>
 
@@ -14,7 +16,18 @@ void Database::ImportData(const std::string& dataPath)
 	std::string data((std::istreambuf_iterator<char>(inData)),
 		std::istreambuf_iterator<char>());
 	// parse the data
-	ParseData(data);
+	std::string::const_iterator it = data.cbegin();
+	while (it != data.cend())
+	{
+		Collection_t collection;
+		std::tie(collection, it) = 
+			m_dataParser.ParseCollection(it, data.cend());
+		// add the collection
+		m_collections.push_back(std::move(collection));
+		// map all of the variables
+		for (const Node_t& node : m_collections.back())
+			m_nodeToCollectionIndexMap.emplace(node, m_collections.size() - 1);
+	}
 }
 
 void Database::ImportData(const std::string& dataPath, std::error_code& ec) noexcept
@@ -46,9 +59,4 @@ void Database::ExecuteQuery(const std::string& queryPath, std::error_code& ec) n
 	{
 		ec = e;
 	}
-}
-
-void Database::ParseData(const std::string& data)
-{
-
 }

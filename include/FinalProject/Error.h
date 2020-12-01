@@ -14,7 +14,12 @@ namespace FinalProject
 {
 	enum class DatabaseErrc
 	{
-		FileNotFound = 1,	// the file was not found
+		FileNotFound = 1,		// the file was not found
+		InvalidVariableName,	// the variable name was invalid
+		InvalidFormat,			// the format was invalid
+		InvalidData,			// the data was invalid
+		InvalidState,			// the state was invalid (data corruption)
+		IncompleteData,			// the data was incomplete
 	};
 	std::error_code make_error_code(DatabaseErrc errc);
 	class DatabaseErrorCategory :

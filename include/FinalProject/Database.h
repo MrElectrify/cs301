@@ -6,10 +6,11 @@
 /// 11/30/20 20:02
 
 // FinalProject includes
-#include <FinalProject/Error.h>
+#include <FinalProject/DataParser.h>
 
 // STL includes
 #include <string>
+#include <system_error>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -50,16 +51,13 @@ namespace FinalProject
 		/// @param ec The error code
 		void ExecuteQuery(const std::string& queryPath, std::error_code& ec) noexcept;
 	private:
-		/// @brief Parses input data and adds to the database
-		/// @param data The data string
-		/// @throws std::error_code
-		void ParseData(const std::string& data);
+		using Node_t = DataParser::Node_t;
+		using Collection_t = DataParser::Collection_t;
 
-		using Node_t = std::pair<std::string, std::string>;
-		using Collection_t = std::vector<Node_t>;
+		DataParser m_dataParser;
 
 		std::vector<Collection_t> m_collections;
-		std::unordered_map<Node_t, std::vector<Collection_t>::const_iterator, impl::hash_pair> m_collectionMap;
+		std::unordered_multimap<Node_t, size_t, impl::hash_pair> m_nodeToCollectionIndexMap;
 	};
 }
 
