@@ -8,8 +8,7 @@ using FinalProject::Detail::Queries::Find;
 
 void Find::Execute(const Database& database)
 {
-	// print the query number
-	std::cout << "//Query " << s_queryNum++ << '\n';
+	Query::Execute(database);
 	if (m_conditions.empty() == true)
 	{
 		// print everything, there are no conditions

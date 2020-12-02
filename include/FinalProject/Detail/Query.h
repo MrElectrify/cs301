@@ -23,11 +23,9 @@ namespace FinalProject
 			/// @brief Executes the query
 			/// @param database The database to use
 			/// @throws std::error_code
-			virtual void Execute(const Database& database) = 0;
+			virtual void Execute(const Database& database);
 
 			virtual ~Query() {}
-		protected:
-			static uint32_t s_queryNum;
 		private:
 			/// @brief Consumes a byte of input
 			/// @param input The input byte
@@ -36,6 +34,8 @@ namespace FinalProject
 			virtual bool Consume(char input) = 0;
 
 			friend class QueryParser;
+
+			static uint32_t s_queryNum;
 		};
 	}
 }
