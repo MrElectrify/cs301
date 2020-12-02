@@ -17,37 +17,64 @@ void Find::Execute(const Database& database)
 			PrintCollection(collection);
 		return;
 	}
-	// TODO: find the smallest list
-	for (auto condIt = m_conditions.begin(); 
-		condIt != m_conditions.end(); ++condIt)
+	// search for the smallest list of equivalent conditions
+	auto bestCondIt = m_conditions.cend();
+	size_t bestSize = SIZE_MAX;
+	for (auto condIt = m_conditions.cbegin(); 
+		condIt != m_conditions.cend(); ++condIt)
 	{
 		if (condIt->GetOperator() == Condition::Operator::EQUALS)
 		{
-			auto range = database.GetNodeToCollectionIndexMap().equal_range(
+			const size_t count = database.GetNodeToCollectionIndexMap().count(
 				{ condIt->GetVar(), condIt->GetLiteral() });
-			// now we can test this small list for each condition
-			for (auto it = range.first; it != range.second; ++it)
+			if (count < bestSize)
 			{
-				bool isMet = true;
-				for (auto condIt2 = m_conditions.begin();
-					condIt2 != m_conditions.end(); ++condIt2)
-				{
-					// we already know this is true
-					if (condIt2 == condIt)
-						continue;
-					if (condIt2->IsMet(database.GetCollectionVec()[it->second]) == false)
-					{
-						isMet = false;
-						break;
-					}
-				}
-				if (isMet == true)
-					PrintCollection(database.GetCollectionVec()[it->second]);
+				bestCondIt = condIt;
+				bestSize = count;
 			}
-			break;
 		}
 	}
+	if (bestCondIt != m_conditions.cend())
+	{
+		// we can optimize by searching only a smaller list
+		auto range = database.GetNodeToCollectionIndexMap().equal_range(
+			{ bestCondIt->GetVar(), bestCondIt->GetLiteral() });
+		for (auto it = range.first; it != range.second; ++it)
+		{
+			bool isMet = true;
+			for (auto condIt2 = m_conditions.cbegin();
+				condIt2 != m_conditions.cend(); ++condIt2)
+			{
+				// we already know this is true
+				if (condIt2 == bestCondIt)
+					continue;
+				if (condIt2->IsMet(database.GetCollectionVec()[it->second]) == false)
+				{
+					isMet = false;
+					break;
+				}
+			}
+			if (isMet == true)
+				PrintCollection(database.GetCollectionVec()[it->second]);
+		}
+		return;
+	}
 	// no optimizations. go through every single collection and check
+	for (const Database::Collection_t& collection : database.GetCollectionVec())
+	{
+		bool isMet = true;
+		for (const Condition& condition : m_conditions)
+		{
+			// check all conditions
+			if (condition.IsMet(collection) == false)
+			{
+				isMet = false;
+				break;
+			}
+		}
+		if (isMet == true)
+			PrintCollection(collection);
+	}
 }
 
 bool Find::Consume(char input)
