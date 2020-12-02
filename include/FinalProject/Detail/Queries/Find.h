@@ -34,7 +34,6 @@ namespace FinalProject
 					EXPECT_CONDITION_LIT,		// expect the literal for a condition
 					EXPECT_PROJECTION_VAR,		// expect a projection variable name
 					EXPECT_NEWLINE_Y,			// expect a newline after a 'Y' condition
-					EXPECT_NEWLINE_END,			// expect a newline after a complete query
 				};
 
 				class Condition

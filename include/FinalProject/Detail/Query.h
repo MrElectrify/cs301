@@ -26,6 +26,8 @@ namespace FinalProject
 			virtual void Execute(const Database& database);
 
 			virtual ~Query() {}
+
+			static uint32_t& GetQueryNum() noexcept { return s_queryNum; }
 		private:
 			/// @brief Consumes a byte of input
 			/// @param input The input byte

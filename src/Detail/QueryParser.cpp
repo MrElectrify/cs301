@@ -20,7 +20,12 @@ bool QueryParser::Consume(QueryPtr_t& queryPtr, char input)
 			else if (m_queryName == "SORT")
 				queryPtr = std::make_unique<Queries::Sort>();
 			else
+			{
 				throw make_error_code(DatabaseErrc::InvalidQuery);
+				m_state = State::EXPECT_QUERYNAME;
+				m_queryName.clear();
+				return false;
+			}
 			m_state = State::EXPECT_QUERYDATA;
 			m_queryName.clear();
 			return false;
@@ -28,11 +33,19 @@ bool QueryParser::Consume(QueryPtr_t& queryPtr, char input)
 		m_queryName.push_back(input);
 		return false;
 	case State::EXPECT_QUERYDATA:
-		if (queryPtr->Consume(input) == true)
+		try
 		{
-			// the query is complete. prepare for the next one
+			if (queryPtr->Consume(input) == true)
+			{
+				// the query is complete. prepare for the next one
+				m_state = State::EXPECT_QUERYNAME;
+				return true;
+			}
+		}
+		catch (const std::error_code& ec)
+		{
 			m_state = State::EXPECT_QUERYNAME;
-			return true;
+			throw ec;
 		}
 		return false;
 	default:

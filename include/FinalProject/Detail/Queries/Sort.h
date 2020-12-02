@@ -30,7 +30,6 @@ namespace FinalProject
 					EXPECT_EQUALS,		// expect the equals sign
 					EXPECT_DIRECTION,	// expect a direction
 					EXPECT_SEMICOLON,	// expect a semicolon
-					EXPECT_NEWLINE,		// expect a newline
 				};
 
 				bool Consume(char input);

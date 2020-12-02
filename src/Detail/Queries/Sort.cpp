@@ -15,8 +15,9 @@ void Sort::Execute(const Database& database)
 	CollectionItVec_t collectionIts;
 	for (size_t i = 0; i < database.GetCollectionVec().size(); ++i)
 	{
-		if (database.GetIndexToContainsSet()[i].find(m_sortVar) ==
-			database.GetIndexToContainsSet()[i].cend())
+		// if it doesn't contain the variable, it fails
+		if (database.GetCollectionVec()[i].second.find(m_sortVar) ==
+			database.GetCollectionVec()[i].second.cend())
 			continue;
 		// the collection contains the variable. add the iterator to the list
 		collectionIts.push_back(database.GetCollectionVec().cbegin() + i);
@@ -72,21 +73,9 @@ bool Sort::Consume(char input)
 			// ignore spaces
 			return false;
 		case ';':
-			m_state = State::EXPECT_NEWLINE;
-			return false;
-		default:
-			throw make_error_code(DatabaseErrc::ExpectedSemicolon);
-		}
-	case State::EXPECT_NEWLINE:
-		switch (input)
-		{
-		case ' ':
-			// ignore spaces
-			return false;
-		case '\n':
 			return true;
 		default:
-			throw make_error_code(DatabaseErrc::UnexpectedChar);
+			throw make_error_code(DatabaseErrc::ExpectedSemicolon);
 		}
 	default:
 		throw make_error_code(DatabaseErrc::InvalidState);
@@ -95,8 +84,10 @@ bool Sort::Consume(char input)
 
 void Sort::PrintCollection(const Database::Collection_t& collection) const noexcept
 {
-	for (const Database::Node_t& node : collection)
-		std::cout << node.first << ": " << node.second << ' ';
+	for (const char varName : collection.first)
+	{
+		std::cout << varName << ": " << collection.second.at(varName) << ' ';
+	}
 	std::cout << '\n';
 }
 
@@ -125,8 +116,8 @@ void Sort::TopDownMerge(CollectionItVec_t& a, size_t iBegin,
 	{
 		if (i < iMiddle && (j >= iEnd ||
 			((m_sortDescending) ?
-				a[i]->at(m_sortVar) > a[j]->at(m_sortVar) :
-				a[i]->at(m_sortVar) <= a[j]->at(m_sortVar))))
+				a[i]->second.at(m_sortVar) > a[j]->second.at(m_sortVar) :
+				a[i]->second.at(m_sortVar) <= a[j]->second.at(m_sortVar))))
 			b[k] = a[i++];
 		else
 			b[k] = a[j++];

@@ -132,8 +132,7 @@ bool Find::Consume(char input)
 			// a projection. add the variable to the list.
 			// the query is parsed. wait for the newline
 			m_projectionVariables.emplace(m_tmpVar);
-			m_state = State::EXPECT_NEWLINE_END;
-			return false;
+			return true;
 		default:
 			if (input < 'A' || input > 'W')
 				throw make_error_code(DatabaseErrc::InvalidVariableName);
@@ -173,8 +172,7 @@ bool Find::Consume(char input)
 			return false;
 		case ';':
 			// we reached the end of the query. wait for the newline
-			m_state = State::EXPECT_NEWLINE_END;
-			return false;
+			return true;
 		default:
 			if (input < 'A' || input > 'W')
 			{
@@ -200,16 +198,6 @@ bool Find::Consume(char input)
 		default:
 			throw make_error_code(DatabaseErrc::UnexpectedChar);
 		}
-	case State::EXPECT_NEWLINE_END:
-		switch (input)
-		{
-		case ' ':
-			return false;
-		case '\n':
-			return true;
-		default:
-			throw make_error_code(DatabaseErrc::UnexpectedChar);
-		}
 	default:
 		throw make_error_code(DatabaseErrc::InvalidState);
 	}
@@ -218,37 +206,36 @@ bool Find::Consume(char input)
 void Find::PrintCollection(const Database::Collection_t& collection) const noexcept
 {
 	size_t numPrinted = 0;
-	for (const Database::Node_t& node : collection)
+	for (const char varName : collection.first)
 	{
 		if (m_projectAllVariables == true ||
-			m_projectionVariables.find(node.first) != m_projectionVariables.cend())
+			m_projectionVariables.find(varName) != m_projectionVariables.cend())
 		{
 			++numPrinted;
-			std::cout << node.first << ": " << node.second << ' ';
+			std::cout << varName << ": " << collection.second.at(varName) << ' ';
 		}
 	}
 	// if it doesn't have any of the fields, print A
 	if (numPrinted == 0)
-		std::cout << "A: " << collection.at('A') << ' ';
+		std::cout << "A: " << collection.second.at('A') << ' ';
 	std::cout << '\n';
 }
 
 bool Find::Condition::IsMet(const Database::Collection_t& collection) const noexcept
 {
-	for (const Database::Node_t& node : collection)
+	const auto varIt = collection.second.find(m_var);
+	// if the variable doesn't exist, it fails
+	if (varIt == collection.second.cend())
+		return false;
+	switch (m_op)
 	{
-		if (m_var == node.first)
-		{
-			switch (m_op)
-			{
-			case Operator::EQUALS:
-				return node.second == m_lit;
-			case Operator::GREATER_THAN:
-				return node.second > m_lit;
-			case Operator::LESS_THAN:
-				return node.second < m_lit;
-			}
-		}
+	case Operator::EQUALS:
+		return varIt->second == m_lit;
+	case Operator::GREATER_THAN:
+		return varIt->second > m_lit;
+	case Operator::LESS_THAN:
+		return varIt->second < m_lit;
+	default:
+		return false;
 	}
-	return false;
 }

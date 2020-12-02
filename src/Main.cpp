@@ -1,8 +1,10 @@
 #include <FinalProject/Database.h>
+#include <FinalProject/Detail/Query.h>
 
 #include <iostream>
 
 using FinalProject::Database;
+using FinalProject::Detail::Query;
 
 int main(int argc, char* argv[])
 {
@@ -19,13 +21,7 @@ int main(int argc, char* argv[])
 	database.ImportQueries(queryPath, ec);
 	if (ec)
 	{
-		std::cerr << "Failed to import queries from " << queryPath << ": " << ec.message() <<  '\n';
-		return 1;
-	}
-	database.ExecuteQueries(ec);
-	if (ec)
-	{
-		std::cerr << "Failed to execute queries\n";
+		std::cerr << "Failed to import queries from " << queryPath << ": " << ec.message() << " (query " << Query::GetQueryNum() << ")\n";
 		return 1;
 	}
 	return 0;

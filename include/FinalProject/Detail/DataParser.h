@@ -10,8 +10,10 @@
 
 // STL includes
 #include <cstdint>
-#include <map>
+#include <unordered_map>
 #include <system_error>
+#include <utility>
+#include <vector>
 
 namespace FinalProject
 {
@@ -21,7 +23,8 @@ namespace FinalProject
 		class DataParser
 		{
 		public:
-			using Collection_t = std::map<char, uint32_t>;
+			using Order_t = std::vector<char>;
+			using Collection_t = std::pair<Order_t, std::unordered_map<char, uint32_t>>;
 
 			/// @brief Parses a collection from an input
 			/// @tparam InputIterator_t The type of input iterator
@@ -34,7 +37,7 @@ namespace FinalProject
 				InputIterator_t begin, InputIterator_t end)
 			{
 				// A stores the ID
-				Collection_t collection = { { 'A', m_lastId++ } };
+				Collection_t collection = { { 'A' }, { { 'A', m_lastId++ } } };
 				while (begin != end)
 				{
 					if (Consume(collection, *begin++) == true)

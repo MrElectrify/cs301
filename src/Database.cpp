@@ -3,6 +3,8 @@
 #include <FinalProject/Error.h>
 
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 using FinalProject::Database;
 
@@ -30,12 +32,8 @@ void Database::ImportData(const std::string& dataPath)
 		// add the collection
 		m_collections.push_back(std::move(collection));
 		// map all of the variables and add them to the set
-		m_indexToContainsSet.emplace_back();
-		for (const auto& node : m_collections.back())
-		{
+		for (const Node_t& node : m_collections.back().second)
 			m_nodeToCollectionIndexMap.emplace(node, m_collections.size() - 1);
-			m_indexToContainsSet.back().emplace(node.first);
-		}
 	}
 }
 
@@ -64,16 +62,26 @@ void Database::ImportQueries(const std::string& queryPath)
 		// standardize line endings to \n
 		queries.push_back('\n');
 	}
-	// parse the data
-	std::string::const_iterator it = queries.cbegin();
-	while (it != queries.cend())
+	// parse each query
+	std::stringstream queryStream(queries);
+	std::string query;
+	while (GetQuery(queryStream, query).eof() == false)
 	{
+		std::string::const_iterator it = query.cbegin();
 		Detail::QueryParser::QueryPtr_t queryPtr;
 		// parse the query
-		std::tie(queryPtr, it) =
-			m_queryParser.ParseQuery(it, queries.cend());
+		try
+		{
+			std::tie(queryPtr, it) =
+				m_queryParser.ParseQuery(it, query.cend());
+		}
+		catch (const std::error_code& ec)
+		{
+			std::cout << "Error parsing query " << Detail::Query::GetQueryNum()++ << ": " << ec.message() << '\n';
+			continue;
+		}
 		// import the query
-		m_queries.push_back(std::move(queryPtr));
+		queryPtr->Execute(*this);
 	}
 }
 
@@ -82,25 +90,6 @@ void Database::ImportQueries(const std::string& queryPath, std::error_code& ec) 
 	try
 	{
 		ImportQueries(queryPath);
-	}
-	catch (const std::error_code& e)
-	{
-		ec = e;
-	}
-}
-
-void Database::ExecuteQueries()
-{
-	for (const Detail::QueryParser::QueryPtr_t& queryPtr : m_queries)
-		queryPtr->Execute(*this);
-	m_queries.clear();
-}
-
-void Database::ExecuteQueries(std::error_code& ec) noexcept
-{
-	try
-	{
-		ExecuteQueries();
 	}
 	catch (const std::error_code& e)
 	{
@@ -139,6 +128,39 @@ std::istream& Database::GetLineCP(std::istream& is, std::string& t) noexcept
 			return is;
 		default:
 			t += (char)c;
+		}
+	}
+}
+
+std::istream& Database::GetQuery(std::istream& is, std::string& t)
+{
+	// get the query until the ';'
+	t.clear();
+	if (std::getline(is, t, ';').eof() == true)
+	{
+		// end of file
+		if (t.empty() == true)
+			return is;
+		throw make_error_code(DatabaseErrc::IncompleteData);
+	}
+	t += ';';
+	// bump the istream until the newline
+	std::streambuf* sb = is.rdbuf();
+	while (true)
+	{
+		int c = sb->sbumpc();
+		switch (c)
+		{
+		case ' ':
+			continue;
+		case '\n':
+			return is;
+		case std::streambuf::traits_type::eof():
+			if (t.empty())
+				is.setstate(std::ios::eofbit);
+			return is;
+		default:
+			throw make_error_code(DatabaseErrc::UnexpectedChar);
 		}
 	}
 }

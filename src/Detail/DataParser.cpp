@@ -34,7 +34,8 @@ bool DataParser::Consume(Collection_t& collection, char input)
 		if (input == ' ' || input == '\n')
 		{
 			// we got a complete data point. add it
-			collection.emplace(m_varName, m_varData);
+			collection.first.push_back(m_varName);
+			collection.second.emplace(m_varName, m_varData);
 			// clear varData
 			m_varData = 0;
 			m_state = State::EXPECT_VARNAME;
