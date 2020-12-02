@@ -25,8 +25,12 @@ std::string DatabaseErrorCategory::message(int ev) const
 		return "The query name was invalid";
 	case DatabaseErrc::InvalidOperator:
 		return "The query contained an invalid operator";
+	case DatabaseErrc::InvalidDirection:
+		return "The sort had in invalid direction";
 	case DatabaseErrc::IncompleteData:
 		return "The input data was incomplete";
+	case DatabaseErrc::ExpectedSemicolon:
+		return "Expected ;";
 	case DatabaseErrc::UnexpectedChar:
 		return "Unexpected character";
 	default:

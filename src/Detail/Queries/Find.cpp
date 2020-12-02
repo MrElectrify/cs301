@@ -230,7 +230,7 @@ void Find::PrintCollection(const Database::Collection_t& collection) const noexc
 	}
 	// if it doesn't have any of the fields, print A
 	if (numPrinted == 0)
-		std::cout << collection[0].first << ": " << collection[0].second << ' ';
+		std::cout << "A: " << collection.at('A') << ' ';
 	std::cout << '\n';
 }
 

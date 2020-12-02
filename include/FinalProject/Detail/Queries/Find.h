@@ -68,6 +68,8 @@ namespace FinalProject
 
 				bool Consume(char input);
 
+				/// @brief Prints a collection with projection constraints
+				/// @param collection The collection to print
 				void PrintCollection(const Database::Collection_t& collection) const noexcept;
 
 				bool m_projectAllVariables = false;

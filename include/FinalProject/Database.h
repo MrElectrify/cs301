@@ -13,6 +13,7 @@
 #include <string>
 #include <system_error>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -21,12 +22,11 @@ namespace FinalProject
 	namespace impl
 	{
 		struct hash_pair {
-			template <class T1, class T2>
-			size_t operator()(const std::pair<T1, T2>& p) const
+			template <class T1>
+			size_t operator()(const std::pair<const char, T1>& p) const
 			{
-				auto hash1 = std::hash<T1>{}(p.first);
-				auto hash2 = std::hash<T2>{}(p.second);
-				return hash1 ^ hash2;
+				auto hash = std::hash<T1>{}(p.second);
+				return hash ^ p.first;
 			}
 		};
 	}
@@ -35,10 +35,11 @@ namespace FinalProject
 	class Database
 	{
 	public:
-		using Node_t = Detail::DataParser::Node_t;
 		using Collection_t = Detail::DataParser::Collection_t;
+		using Node_t = Collection_t::value_type;
 		using CollectionVec_t = std::vector<Collection_t>;
 		using NodeToCollectionIndexMap_t = std::unordered_multimap<Node_t, size_t, impl::hash_pair>;
+		using IndexToContainsSet_t = std::vector<std::unordered_set<char>>;
 		
 		/// @brief Imports data to the database
 		/// @param dataPath The path to the data
@@ -64,12 +65,14 @@ namespace FinalProject
 
 		const CollectionVec_t& GetCollectionVec() const noexcept { return m_collections; }
 		const NodeToCollectionIndexMap_t& GetNodeToCollectionIndexMap() const noexcept { return m_nodeToCollectionIndexMap; }
+		const IndexToContainsSet_t& GetIndexToContainsSet() const noexcept { return m_indexToContainsSet; }
 	private:
 		Detail::DataParser m_dataParser;
 		Detail::QueryParser m_queryParser;
 
 		CollectionVec_t m_collections;
 		NodeToCollectionIndexMap_t m_nodeToCollectionIndexMap;
+		IndexToContainsSet_t m_indexToContainsSet;
 		std::vector<Detail::QueryParser::QueryPtr_t> m_queries;
 	};
 }

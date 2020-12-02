@@ -10,9 +10,8 @@
 
 // STL includes
 #include <cstdint>
+#include <map>
 #include <system_error>
-#include <utility>
-#include <vector>
 
 namespace FinalProject
 {
@@ -22,8 +21,7 @@ namespace FinalProject
 		class DataParser
 		{
 		public:
-			using Node_t = std::pair<char, uint32_t>;
-			using Collection_t = std::vector<Node_t>;
+			using Collection_t = std::map<char, uint32_t>;
 
 			/// @brief Parses a collection from an input
 			/// @tparam InputIterator_t The type of input iterator

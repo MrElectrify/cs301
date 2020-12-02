@@ -21,7 +21,9 @@ namespace FinalProject
 		InvalidState,			// the state was invalid (data corruption)
 		InvalidQuery,			// the query name was invalid
 		InvalidOperator,		// the query contained an invalid operator
+		InvalidDirection,		// the sort had an invalid direction
 		IncompleteData,			// the data was incomplete
+		ExpectedSemicolon,		// a semicolon was expected
 		UnexpectedChar,			// unexpected character
 	};
 	std::error_code make_error_code(DatabaseErrc errc);

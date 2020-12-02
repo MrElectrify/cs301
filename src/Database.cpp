@@ -24,9 +24,13 @@ void Database::ImportData(const std::string& dataPath)
 			m_dataParser.ParseCollection(it, data.cend());
 		// add the collection
 		m_collections.push_back(std::move(collection));
-		// map all of the variables
-		for (const Node_t& node : m_collections.back())
+		// map all of the variables and add them to the set
+		m_indexToContainsSet.emplace_back();
+		for (const auto& node : m_collections.back())
+		{
 			m_nodeToCollectionIndexMap.emplace(node, m_collections.size() - 1);
+			m_indexToContainsSet.back().emplace(node.first);
+		}
 	}
 }
 
