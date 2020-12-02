@@ -10,6 +10,7 @@
 #include <FinalProject/Detail/QueryParser.h>
 
 // STL includes
+#include <istream>
 #include <string>
 #include <system_error>
 #include <unordered_map>
@@ -67,6 +68,12 @@ namespace FinalProject
 		const NodeToCollectionIndexMap_t& GetNodeToCollectionIndexMap() const noexcept { return m_nodeToCollectionIndexMap; }
 		const IndexToContainsSet_t& GetIndexToContainsSet() const noexcept { return m_indexToContainsSet; }
 	private:
+		/// @brief Getline, but cross-platform line endings
+		/// @param is The input stream
+		/// @param t The output string
+		/// @return The input stream
+		static std::istream& GetLineCP(std::istream& is, std::string& t) noexcept;
+
 		Detail::DataParser m_dataParser;
 		Detail::QueryParser m_queryParser;
 

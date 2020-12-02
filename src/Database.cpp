@@ -3,18 +3,23 @@
 #include <FinalProject/Error.h>
 
 #include <fstream>
-#include <iterator>
 
 using FinalProject::Database;
 
 void Database::ImportData(const std::string& dataPath)
 {
-	std::ifstream inData(dataPath);
+	std::ifstream inData(dataPath, std::ios_base::binary);
+	
 	if (inData.good() == false)
 		throw make_error_code(DatabaseErrc::FileNotFound);
 	// read the data
-	std::string data((std::istreambuf_iterator<char>(inData)),
-		std::istreambuf_iterator<char>());
+	std::string data, tmp;
+	while (GetLineCP(inData, tmp).eof() == false)
+	{
+		data.append(tmp);
+		// standardize line endings to \n
+		data.push_back('\n');
+	}
 	// parse the data
 	std::string::const_iterator it = data.cbegin();
 	while (it != data.cend())
@@ -48,12 +53,17 @@ void Database::ImportData(const std::string& dataPath, std::error_code& ec) noex
 
 void Database::ImportQueries(const std::string& queryPath)
 {
-	std::ifstream inQuery(queryPath);
-	if (inQuery.good() == false)
+	std::ifstream inQueries(queryPath, std::ios_base::binary);
+	if (inQueries.good() == false)
 		throw make_error_code(DatabaseErrc::FileNotFound);
 	// read the data
-	std::string queries((std::istreambuf_iterator<char>(inQuery)),
-		std::istreambuf_iterator<char>());
+	std::string queries, tmp;
+	while (GetLineCP(inQueries, tmp).eof() == false)
+	{
+		queries.append(tmp);
+		// standardize line endings to \n
+		queries.push_back('\n');
+	}
 	// parse the data
 	std::string::const_iterator it = queries.cbegin();
 	while (it != queries.cend())
@@ -95,5 +105,40 @@ void Database::ExecuteQueries(std::error_code& ec) noexcept
 	catch (const std::error_code& e)
 	{
 		ec = e;
+	}
+}
+
+// by user763305 from https://stackoverflow.com/a/6089413/6815521.
+// I don't know which line endings there will be, so I need to standardize it to \n
+std::istream& Database::GetLineCP(std::istream& is, std::string& t) noexcept
+{
+	t.clear();
+
+	// The characters in the stream are read one-by-one using a std::streambuf.
+	// That is faster than reading them one-by-one using the std::istream.
+	// Code that uses streambuf this way must be guarded by a sentry object.
+	// The sentry object performs various tasks,
+	// such as thread synchronization and updating the stream state.
+
+	std::istream::sentry se(is, true);
+	std::streambuf* sb = is.rdbuf();
+
+	for (;;) {
+		int c = sb->sbumpc();
+		switch (c) {
+		case '\n':
+			return is;
+		case '\r':
+			if (sb->sgetc() == '\n')
+				sb->sbumpc();
+			return is;
+		case std::streambuf::traits_type::eof():
+			// Also handle the case when the last line has no line ending
+			if (t.empty())
+				is.setstate(std::ios::eofbit);
+			return is;
+		default:
+			t += (char)c;
+		}
 	}
 }
