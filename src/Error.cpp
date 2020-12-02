@@ -29,6 +29,8 @@ std::string DatabaseErrorCategory::message(int ev) const
 		return "The sort had in invalid direction";
 	case DatabaseErrc::IncompleteData:
 		return "The input data was incomplete";
+	case DatabaseErrc::IncompleteQuery:
+		return "The input query was incomplete";
 	case DatabaseErrc::ExpectedSemicolon:
 		return "Expected ;";
 	case DatabaseErrc::UnexpectedChar:

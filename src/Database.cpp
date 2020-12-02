@@ -65,31 +65,38 @@ void Database::ImportQueries(const std::string& queryPath)
 	// parse each query
 	std::stringstream queryStream(queries);
 	std::string query;
-	while (GetQuery(queryStream, query).eof() == false)
+	try
 	{
-		std::string::const_iterator it = query.cbegin();
-		Detail::QueryParser::QueryPtr_t queryPtr;
-		// parse the query
-		try
+		while (GetQuery(queryStream, query).eof() == false)
 		{
-			std::tie(queryPtr, it) =
-				m_queryParser.ParseQuery(it, query.cend());
+			std::string::const_iterator it = query.cbegin();
+			Detail::QueryParser::QueryPtr_t queryPtr;
+			// parse the query
+			try
+			{
+				std::tie(queryPtr, it) =
+					m_queryParser.ParseQuery(it, query.cend());
+			}
+			catch (const std::error_code& ec)
+			{
+				std::cout << "Error parsing query " << Detail::Query::GetQueryNum()++ << ": " << ec.message() << '\n';
+				continue;
+			}
+			// import the query
+			queryPtr->Execute(*this);
 		}
-		catch (const std::error_code& ec)
-		{
-			std::cout << "Error parsing query " << Detail::Query::GetQueryNum()++ << ": " << ec.message() << '\n';
-			continue;
-		}
-		// import the query
-		queryPtr->Execute(*this);
+	}
+	catch (const std::error_code& ec)
+	{
+		std::cout << "Error parsing query " << Detail::Query::GetQueryNum() << ": " << ec.message() << '\n';
 	}
 }
 
-void Database::ImportQueries(const std::string& queryPath, std::error_code& ec) noexcept
+void Database::ImportQueries(const std::string& dataPath, std::error_code& ec) noexcept
 {
 	try
 	{
-		ImportQueries(queryPath);
+		ImportQueries(dataPath);
 	}
 	catch (const std::error_code& e)
 	{
@@ -141,7 +148,7 @@ std::istream& Database::GetQuery(std::istream& is, std::string& t)
 		// end of file
 		if (t.empty() == true)
 			return is;
-		throw make_error_code(DatabaseErrc::IncompleteData);
+		throw make_error_code(DatabaseErrc::IncompleteQuery);
 	}
 	t += ';';
 	// bump the istream until the newline

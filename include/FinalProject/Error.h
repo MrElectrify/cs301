@@ -23,6 +23,7 @@ namespace FinalProject
 		InvalidOperator,		// the query contained an invalid operator
 		InvalidDirection,		// the sort had an invalid direction
 		IncompleteData,			// the data was incomplete
+		IncompleteQuery,		// the query was incomplete
 		ExpectedSemicolon,		// a semicolon was expected
 		UnexpectedChar,			// unexpected character
 	};
