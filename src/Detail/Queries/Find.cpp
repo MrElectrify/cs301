@@ -215,10 +215,8 @@ void Find::PrintCollection(const Database::Collection_t& collection) const noexc
 			std::cout << varName << ": " << collection.second.at(varName) << ' ';
 		}
 	}
-	// if it doesn't have any of the fields, print A
-	if (numPrinted == 0)
-		std::cout << "A: " << collection.second.at('A') << ' ';
-	std::cout << '\n';
+	if (numPrinted > 0)
+		std::cout << '\n';
 }
 
 bool Find::Condition::IsMet(const Database::Collection_t& collection) const noexcept

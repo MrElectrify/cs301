@@ -79,7 +79,7 @@ void Database::ImportQueries(const std::string& queryPath)
 			}
 			catch (const std::error_code& ec)
 			{
-				std::cout << "Error parsing query " << Detail::Query::GetQueryNum()++ << ": " << ec.message() << '\n';
+				std::cout << "//Query " << Detail::Query::GetQueryNum()++ << "\nError: " << ec.message() << '\n';
 				// reset the parser
 				m_queryParser = Detail::QueryParser();
 				continue;
