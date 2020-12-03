@@ -21,10 +21,9 @@ bool QueryParser::Consume(QueryPtr_t& queryPtr, char input)
 				queryPtr = std::make_unique<Queries::Sort>();
 			else
 			{
-				throw make_error_code(DatabaseErrc::InvalidQuery);
 				m_state = State::EXPECT_QUERYNAME;
 				m_queryName.clear();
-				return false;
+				throw make_error_code(DatabaseErrc::InvalidQuery);
 			}
 			m_state = State::EXPECT_QUERYDATA;
 			m_queryName.clear();
