@@ -19,7 +19,7 @@
 
 namespace FinalProject
 {
-	namespace impl
+	namespace Detail
 	{
 		struct hash_pair {
 			template <class T1>
@@ -38,7 +38,7 @@ namespace FinalProject
 		using Collection_t = Detail::DataParser::Collection_t;
 		using Node_t = Collection_t::second_type::value_type;
 		using CollectionVec_t = std::vector<Collection_t>;
-		using NodeToCollectionIndexMap_t = std::unordered_multimap<Node_t, size_t, impl::hash_pair>;
+		using NodeToCollectionIndexMap_t = std::unordered_multimap<Node_t, size_t, Detail::hash_pair>;
 		
 		/// @brief Imports data to the database
 		/// @param dataPath The path to the data
