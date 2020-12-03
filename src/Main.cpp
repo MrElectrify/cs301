@@ -18,10 +18,10 @@ int main(int argc, char* argv[])
 		std::cerr << "Failed to import data from " << dataPath << ": " << ec.message() << '\n';
 		return 1;
 	}
-	database.ImportQueries(queryPath);
+	database.ImportQueries(queryPath, ec);
 	if (ec)
 	{
-		std::cerr << "Failed to import queries from " << queryPath << ": " << ec.message() << " (query " << Query::GetQueryNum() << ")\n";
+		std::cerr << "Failed to import queries from " << queryPath << ": " << ec.message() << '\n';
 		return 1;
 	}
 	return 0;
